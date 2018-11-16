@@ -1,0 +1,14 @@
+# depslib dependency file v1.0
+1540369184 source:c:\users\j\desktop\candcpp\codes\data_struct_homework\horse_in_checkboard\main.cpp
+	<iostream>
+	"Classes.h"
+
+1540363944 c:\users\j\desktop\candcpp\codes\data_struct_homework\horse_in_checkboard\classes.h
+	<vector>
+	<array>
+
+1539928081 source:c:\users\j\desktop\candcpp\codes\data_struct_homework\horse_in_checkboard\funcs.cpp
+	<iostream>
+	<algorithm>
+	"Classes.h"
+

@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1541575717 source:c:\users\j\desktop\candcpp\codes\data_struct_homework\maze_problem\main.cpp
+	<iostream>
+	<utility>
+	<vector>
+	<map>
+	"walk_array.h"
+
+1541574655 c:\users\j\desktop\candcpp\codes\data_struct_homework\maze_problem\walk_array.h
+	<vector>
+
