@@ -43,6 +43,8 @@ public:
 	//bool rm_left_child(const Node<T>* parent_);
 	//bool rm_right_child(const Node<T>* parent_);
 	template<typename Y, typename...Types>
+	bool recur_preorder_traverse(const node_type* nd, Y fp(node_type*, Types...), Types... args);
+	template<typename Y, typename...Types>
 	bool in_order_traverse(Y fp(node_type*, Types...), Types... args);
 	bool in_order_linked();//其他方式的线索化还没写
 	bool pre_order_linked();
@@ -203,10 +205,17 @@ inline bool Tree<T>::swap(const Node<T>* parent) const
 template<typename T>
 inline bool Tree<T>::clear()
 {
+	/*if (!_linked_) {
+		this->_empty_ = true;
+		this->_linked_ = false;
+		this->l_type = None;
+		return this->__clear__();
+	}*/
+	this->__clear__();
 	this->_empty_ = true;
 	this->_linked_ = false;
 	this->l_type = None;
-	return this->__clear__();
+	return true;
 }
 template<typename T>
 inline bool Tree<T>::__swap__(Node<T>* ptr) const
@@ -230,12 +239,30 @@ template<typename T>
 inline bool Tree<T>::__clear__()
 {
 	std::vector<Node<T> *> rec_vec;
-	this->in_order_traverse<bool, std::vector<Node<T> *>&>(this->__collect_ptr, rec_vec);
+	if (!_linked_ || l_type == in_order) {
+		this->in_order_traverse<bool, std::vector<Node<T> *>&>(this->__collect_ptr, rec_vec);
+	}
+	else if( _linked_ && l_type == pre_order) {
+		this->pre_order_traverse<bool, std::vector<Node<T> *>&>(this->__collect_ptr, rec_vec);
+	}
+	else{
+		std::cout << "还没解决这种清除方式" << std::endl;
+		return false;
+	}
 	for (auto ptr : rec_vec) {
 		delete ptr;
 	}
 	root_parent.l_child = NULL;
 	return true;
+}
+template<typename T>
+template<typename Y, typename ...Types>
+inline bool Tree<T>::recur_preorder_traverse(const node_type * nd, Y fp(node_type *, Types...), Types ...args)
+{
+	if (nd == NULL) { return  true; }
+	(*fp)(const_cast<node_type*>(nd), args...);
+	return this->recur_preorder_traverse<Y, Types...>(const_cast<const node_type*>(nd->l_child), fp, args...) &&
+		this->recur_preorder_traverse<Y, Types...>(const_cast<const node_type*>(nd->r_child), fp, args...);
 }
 template<typename T>
 template<typename Y, typename ...Types>

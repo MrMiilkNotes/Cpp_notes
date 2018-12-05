@@ -62,8 +62,12 @@ void func_6()
 	MyTree tree_1(0);
 	create_tree(tree_1);
 	vector<data_type> rec_vec;
-	tree_1.in_order_traverse<bool, vector<data_type>&>(func_4, rec_vec);
+	cout << "递归前序遍历：";
+	tree_1.recur_preorder_traverse<bool, vector<data_type>&>(tree_1.root(), func_4, rec_vec);
+	print_res(rec_vec);
+	rec_vec.clear();
 	cout << "非递归中序遍历：";
+	tree_1.in_order_traverse<bool, vector<data_type>&>(func_4, rec_vec);
 	print_res(rec_vec);
 	rec_vec.clear();
 	cout << "非递归前序遍历：";
@@ -80,14 +84,17 @@ void func_6()
 	tree_1.pre_order_traverse<bool, vector<data_type>&>(func_4, rec_vec);
 	print_res(rec_vec);
 	rec_vec.clear();*/
-	//cout << "中序线索化，遍历：";//线索化一定放在最后
-	//tree_1.in_order_linked();
-	//tree_1.in_order_traverse<bool, vector<data_type>&>(func_4, rec_vec);
-	//print_res(rec_vec);
-	//rec_vec.clear();
+	cout << "中序线索化，遍历：";
+	tree_1.in_order_linked();
+	tree_1.in_order_traverse<bool, vector<data_type>&>(func_4, rec_vec);
+	print_res(rec_vec);
+	rec_vec.clear();
+	tree_1.clear();
+	MyTree tree_2(0);
+	create_tree(tree_2);
 	cout << "先序线索化，遍历：";
-	tree_1.pre_order_linked();
-	tree_1.pre_order_traverse<bool, vector<data_type>&>(func_4, rec_vec);
+	tree_2.pre_order_linked();
+	tree_2.pre_order_traverse<bool, vector<data_type>&>(func_4, rec_vec);
 	print_res(rec_vec);
 	rec_vec.clear();
 }
