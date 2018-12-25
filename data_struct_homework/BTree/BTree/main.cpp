@@ -23,6 +23,8 @@ int main()
 	cout << BT << endl;
 	BT.Insert(8);
 	cout << BT << endl;
+
+	cout << BT.Search(6) << endl;
 	system("pause");
 	return 0;
 }

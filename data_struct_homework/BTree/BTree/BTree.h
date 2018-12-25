@@ -59,6 +59,8 @@ public:
 	_Tp_data& exchg_max(const _Tp_data& d_);//
 	data_bag* split();//分裂成三个节点
 
+	bool find(const _Tp_data& d_) const;
+
 	//friend class BTree;
 	friend std::ostream& operator<< (std::ostream& os, const self& node)
 	{
@@ -100,7 +102,7 @@ public:
 	//析构函数
 	//拷贝构造，拷贝赋值
 	bool Insert(const _Tp_data& d_);//如果存在则返回false
-	bool search(const _Tp_data& d_);
+	bool Search(const _Tp_data& d_);
 	bool delete_(const _Tp_data& d_);
 	//遍历 输出->在node中重载输出操作
 
@@ -113,6 +115,7 @@ public:
 	}
 private:
 	data_bag* insert(node_type* nd_ptr, const _Tp_data& d_);
+	bool search(const node_type* nd_ptr, const _Tp_data& d_);
 };
 
 #endif // !BTree_H_INCLUDED
@@ -233,6 +236,31 @@ BTree_node<_Tp_data_, _Nm>::merge(const self & nd_)
 }
 
 template<typename _Tp_data_, std::size_t _Nm>
+inline bool BTree_node<_Tp_data_, _Nm>::find(const _Tp_data & d_) const
+{
+	auto first = nd_data.cbegin(), it = nd_data.cbegin();
+	int count(num_sub_nds-2), step;
+	while (count > 0) {
+		step = count / 2;
+		it = first;
+		advance(it, step);
+		if ((*it) < d_) {
+			first = ++it;
+			count -= step + 1;
+		}
+		else{
+			count = step;
+		}
+	}
+	/*for (auto item : nd_data) {
+		if (item == d_) {
+			return true;
+		}
+	}*/
+	return (*first) == d_;
+}
+
+template<typename _Tp_data_, std::size_t _Nm>
 inline bool BTree<_Tp_data_, _Nm>::Insert(const _Tp_data & d_)
 {
 	if (this->root_ptr == NULL) { //根节点
@@ -244,6 +272,12 @@ inline bool BTree<_Tp_data_, _Nm>::Insert(const _Tp_data & d_)
 		root_ptr = res;
 	}
 	return true;
+}
+
+template<typename _Tp_data_, std::size_t _Nm>
+inline bool BTree<_Tp_data_, _Nm>::Search(const _Tp_data & d_)
+{
+	return this->search(root_ptr, d_);
 }
 
 template<typename _Tp_data_, std::size_t _Nm>
@@ -262,6 +296,23 @@ BTree<_Tp_data_, _Nm>::insert(node_type * nd_ptr, const _Tp_data & d_)
 		return nd_ptr->insert(bag_ptr);//合并到当前节点
 	}
 	return NULL;
+}
+
+template<typename _Tp_data_, std::size_t _Nm>
+inline bool BTree<_Tp_data_, _Nm>::search(const node_type * nd_ptr, const _Tp_data & d_)
+{
+	if (nd_ptr == NULL) {
+		return false;
+	}
+	if (!nd_ptr->find(d_)) {
+		for (int i = 0; i != nd_ptr->num_sub_nds; ++i) {
+			if (this->search((nd_ptr->sub_nds)[i], d_)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	return true;
 }
 
 template<typename _Tp_data_, std::size_t _Nm>
