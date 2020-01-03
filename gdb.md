@@ -1,5 +1,9 @@
 # GDB
 
+## 参考
+
+ 范蠡 老师，*gitchat*， [Linux GDB 调试指南](https://gitbook.cn/gitchat/column/5c0e149eedba1b683458fd5f) 。
+
 ## 使用GDB的方式
 
 ### 直接调试
@@ -96,7 +100,38 @@ echo "/root/testcore/core-%e-%p-%t" > /proc/sys/kernel/core_pattern
 
 - *print*不只是打印值，还可以修改值，使用表达式等，使用*ptype*查看类型
 - 使用*backtrace*来查看调用堆栈，使用*frame <idx>*转到对应帧
-- 断点相关的*b*， *enable*，*disable*，*info b*，*delete*(所有断点)
+- 断点相关的：*b*， *enable*，*disable*，*info b*，*delete*(所有断点)
+
+#### 控制流
+
+> 常用的函数调用方式有*_cdecl*和*_stdcall*，*C++*非静态成员函数的调用方式是*_thiscall*，在这几种调用方式中，函数的传递都是从右向左入栈，因此如果某个的函数传入参数是别的函数的返回值，通常会从右向左计算，但是*C++ Primer*中提到标准里并没有相关规定，因此如果函数的多个传入参数都是函数，且这些函数的调用顺序会影响结果，不要使用如下形式：
+>
+> ```C++
+> func1(func2(), func3());
+> ```
+>
+> 
+
+- *next*：单步步过
+- *step*：单步步入
+- *return*：从当前调用函数(不执行完，直接)返回
+- *finish*：执行完当前函数并返回
+- *until <line>*：执行到某一行后停下
+- *jump <line>*：直接跳转到某个位置
+
+**临时断点**
+
+​	*tbreak*：触发一次后就会删除
+
+#### 命令行参数
+
+​	在*run*之前，使用*show(set) args*查看和修改命令行参数，比如
+
+```shell
+set args "999 xx" "hu jj"	# 多个参数
+```
+
+
 
 ### 多线程
 
@@ -105,3 +140,44 @@ echo "/root/testcore/core-%e-%p-%t" > /proc/sys/kernel/core_pattern
 ![image-20200102234811573](gdb.assets/image-20200102234811573.png)
 
 >  在早期的 Linux 系统的内核里面，其实不存在真正的线程实现，当时所有的线程都是用进程来实现的，这些模拟线程的进程被称为 Light Weight Process（轻量级进程），后来 Linux 系统有了真正的线程实现，这个名字仍然被保留了下来。 
+
+编号为1的线程为主线程，通过*thread <Id>*可以切换线程。
+
+查看线程调用堆栈中函数的输入参数：
+
+![image-20200103190858131](gdb.assets/image-20200103190858131.png)
+
+### 反编译
+
+​	“ 当进行一些高级调试时，我们可能需要查看某段代码的汇编指令去排查问题，或者是在调试一些没有调试信息的发布版程序时，也只能通过反汇编代码去定位问题 ”
+
+​	使用*disassemble*查看反编译代码，使用*show(set) disassembly-flavor* 查看或修改反编译的目标语言
+
+### 监视
+
+​	使用*watch*可以监视变量或者内存，当它发生变化的时候就会中断
+
+>  **watch** 命令是一个强大的命令，它可以用来监视一个变量或者一段内存，当这个变量或者该内存处的值发生变化时，GDB 就会中断下来。被监视的某个变量或者某个内存地址会产生一个 watch point（观察点） 
+
+```shell
+# 普通变量
+int i;
+watch i
+
+# 指针
+int *p
+watch p		# 监视指针本身
+watch *p	# 监视指针指向的内存
+
+# 数组
+char buf[128]
+watch buf	# 监视buf的所有变量
+# 此时不是采用硬件断点，而是用软中断实现的。用软中断方式去检查内存变量是比较耗费 CPU 资源的，精确地指明地址是硬件中断
+```
+
+>  当设置的观察点是一个局部变量时，局部变量无效后，观察点也会失效。在观察点失效时 GDB 可能会提示如下信息 
+>
+> ```shell
+> Watchpoint 2 deleted because the program has left the block in which its expression is valid
+> ```
+
