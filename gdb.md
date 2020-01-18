@@ -105,3 +105,4 @@ echo "/root/testcore/core-%e-%p-%t" > /proc/sys/kernel/core_pattern
 ![image-20200102234811573](gdb.assets/image-20200102234811573.png)
 
 >  在早期的 Linux 系统的内核里面，其实不存在真正的线程实现，当时所有的线程都是用进程来实现的，这些模拟线程的进程被称为 Light Weight Process（轻量级进程），后来 Linux 系统有了真正的线程实现，这个名字仍然被保留了下来。 
+
