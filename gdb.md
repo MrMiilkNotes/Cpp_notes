@@ -99,8 +99,14 @@ echo "/root/testcore/core-%e-%p-%t" > /proc/sys/kernel/core_pattern
 ### 基础使用
 
 - *print*不只是打印值，还可以修改值，使用表达式等，使用*ptype*查看类型
+
+  > 如果字符串太长导致无法全部显示，可以使用*set print element 0*设置
+
 - 使用*backtrace*来查看调用堆栈，使用*frame <idx>*转到对应帧
+
 - 断点相关的：*b*， *enable*，*disable*，*info b*，*delete*(所有断点)
+
+- 需要给进程发信号可以使用*signal <signal>*。
 
 #### 控制流
 
@@ -122,6 +128,22 @@ echo "/root/testcore/core-%e-%p-%t" > /proc/sys/kernel/core_pattern
 **临时断点**
 
 ​	*tbreak*：触发一次后就会删除
+
+ **条件断点** 
+
+​	格式：*break [lineNo] if [condition]*，比如：
+
+```shell
+break 11 if i==500
+```
+
+​	也可以对已经添加的断点设置条件，需要使用*info bread*查看相应的断点编号:
+
+```shell
+condition 2 if i==500
+```
+
+
 
 #### 命令行参数
 
@@ -147,6 +169,29 @@ set args "999 xx" "hu jj"	# 多个参数
 
 ![image-20200103190858131](gdb.assets/image-20200103190858131.png)
 
+#### 线程切换
+
+​	在调试多线程程序的时候，继续之前中断的程序可能会出现线程切换，GDB提供了锁定一个线程的功能，即只有当前线程能运行
+
+```shell
+set scheduler-locking on(off)
+```
+
+### 多进程
+
+​	指通过*fork*的子进程，可以在子进程*fork*出来后用*gdb attach*，或者使用*follow-fork*选项
+
+```shell
+(gdb) show follow-fork mode     
+Debugger response to a program call of fork or vfork is "parent".
+(gdb) set follow-fork child
+(gdb) show follow-fork mode
+Debugger response to a program call of fork or vfork is "child".
+(gdb) 
+```
+
+
+
 ### 反编译
 
 ​	“ 当进行一些高级调试时，我们可能需要查看某段代码的汇编指令去排查问题，或者是在调试一些没有调试信息的发布版程序时，也只能通过反汇编代码去定位问题 ”
@@ -157,7 +202,7 @@ set args "999 xx" "hu jj"	# 多个参数
 
 ​	使用*watch*可以监视变量或者内存，当它发生变化的时候就会中断
 
->  **watch** 命令是一个强大的命令，它可以用来监视一个变量或者一段内存，当这个变量或者该内存处的值发生变化时，GDB 就会中断下来。被监视的某个变量或者某个内存地址会产生一个 watch point（观察点） 
+>  **watch** 命令是一个强大的命令，它可以用来监视一个变量或者一段内存，当这个变量或者该内存处的值发生变化时，GDB 就会中断下来。被监视的某个变量或者某个内存地址会产生一个 watch point（观察点）
 
 ```shell
 # 普通变量
@@ -181,3 +226,31 @@ watch buf	# 监视buf的所有变量
 > Watchpoint 2 deleted because the program has left the block in which its expression is valid
 > ```
 
+​	使用*display*设置每次中断都会打印的变量，使用*info display*查看，之后可以用*delete display <idx>*删除。
+
+## TUI窗口
+
+1. 可以使用 gdbtui 命令或者 gdb-tui 命令开启一个调试 
+
+```shell
+gdbtui -q # 需要调试的程序名
+```
+
+2. 直接使用 GDB 调试代码，在需要的时候使用切换键 **Ctrl + X + A**  
+
+**窗口**
+
+​	可以使用*layout <win>*切换/开启窗口
+
+- （cmd）command 命令窗口，可以输入调试命令
+- （src）source 源代码窗口， 显示当前行、断点等信息
+- （asm）assembly 汇编代码窗口
+- （reg）register 寄存器窗口
+
+## **CGDB**
+
+​	TUI会有“花屏”的问题，CGDB是在GDB上的封装，会更好用一点。但是*print*不能显示中文
+
+##  VisualGDB 
+
+​	
